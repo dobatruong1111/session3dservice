@@ -21,5 +21,4 @@ public class Session3dAPI {
 		Session3dDtoGet session = session3DService.create(object);
 		return new APIResponse<>(new APIResponseHeader(200, "Created"), session);
     }
-	
 }

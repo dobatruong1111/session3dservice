@@ -35,7 +35,7 @@ public class ProcessManager {
         this.processes = new HashMap<>();
     }
 
-    private String getLogFilePath(String id) {
+    public String getLogFilePath(String id) {
         return String.format("%s%s%s.txt", this.configProperties.getLogPath(), "/", id);
     }
 
@@ -83,7 +83,6 @@ public class ProcessManager {
                 } catch (Exception e) {
                     logger.info(e.getMessage());
                 }
-
                 count += 1;
             }
 
@@ -139,7 +138,6 @@ public class ProcessManager {
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-
         return ready;
     }
 }

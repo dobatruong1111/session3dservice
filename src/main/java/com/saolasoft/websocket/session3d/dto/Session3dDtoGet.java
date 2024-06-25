@@ -24,6 +24,7 @@ public class Session3dDtoGet {
 	public Session3dDtoGet(Session3d session) {
 		this.id = session.getId();
 		this.sessionUrl = session.getSessionUrl();
+		this.host = session.getHost();
+		this.port = session.getPort();
 	}
-
 }

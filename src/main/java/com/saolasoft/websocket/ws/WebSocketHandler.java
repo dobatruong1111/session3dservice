@@ -37,12 +37,12 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
             return;
         }
 
-        // Extract session3d id
+        // Extract id
         String session3dId = query.split("&")[0].split("=")[1];
-        // Get session3d by id
+        
+        // Get session by id
         Session3dDtoGet session3d = session3dService.getById(session3dId);
-        //logger.info(String.format("Session3d: id=%s, host=%s, port=%d, cmd=%s", session3d.getId(), session3d.getHost(), session3d.getPort(), session3d.getCmd()));
-
+        
         incomingWsSessions.put(session.getId(), new IncomingWebSocketSession(session3dId, session));
         // Optionally, connect to other WebSocket servers
         String sessionUrl = String.format("ws://%s:%d/ws", session3d.getHost(), session3d.getPort());
@@ -82,9 +82,6 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         if (client != null) {
             client.close();
         }
-
-        // Remove 3D session
-        session3dService.terminateSession(webSocketSession.getSession3dId());
     }
 
     public void sendMessageToClient(String sessionId, String message) throws Exception {
@@ -104,5 +101,4 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
             session.sendMessage(new BinaryMessage(message));
         }
     }
-
 }
