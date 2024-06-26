@@ -9,8 +9,6 @@ public class Session3d {
 	
 	private String id;
 
-	private String wsSessionId;
-
 	private String host;
 
 	private int port;
@@ -26,5 +24,4 @@ public class Session3d {
 		this.sessionUrl = sessionUrl;
 		this.cmd = cmd;
 	}
-
 }

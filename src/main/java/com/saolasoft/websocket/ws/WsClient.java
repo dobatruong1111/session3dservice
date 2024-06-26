@@ -3,23 +3,32 @@ package com.saolasoft.websocket.ws;
 import com.saolasoft.websocket.ws.WebSocketHandler;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.URI;
 import java.nio.ByteBuffer;
 
 public class WsClient extends WebSocketClient {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final String sessionId;
+
     private final WebSocketHandler handler;
+
+    private final String sessionUrl;
 
     public WsClient(String sessionId, WebSocketHandler handler, String sessionUrl) throws Exception {
         super(new URI(sessionUrl));
         this.sessionId = sessionId;
         this.handler = handler;
+        this.sessionUrl = sessionUrl;
     }
 
     @Override
     public void onOpen(ServerHandshake handshake) {
-        System.out.println("Connected to server: " + sessionId);
+        logger.info(String.format("Connected to %s", this.sessionUrl));
     }
 
     @Override
@@ -42,7 +51,7 @@ public class WsClient extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        System.out.println("Connection closed: " + sessionId);
+        logger.info(String.format("Disconnected to %s", this.sessionUrl));
     }
 
     @Override
@@ -50,8 +59,8 @@ public class WsClient extends WebSocketClient {
         ex.printStackTrace();
     }
 
-    public void connectToServer(String url) throws Exception {
-        super.uri = new URI(url);
+    public void connectToServer() throws Exception {
+        super.uri = new URI(this.sessionUrl);
         this.connect();
     }
 

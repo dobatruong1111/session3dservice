@@ -11,20 +11,9 @@ public class Session3dDtoGet {
 	private String id;
 
 	private String sessionUrl;
-
-	private String host;
-
-	private int port;
 	
 	public Session3dDtoGet(String id, String sessionUrl) {
 		this.id = id;
 		this.sessionUrl = sessionUrl;
-	}
-
-	public Session3dDtoGet(Session3d session) {
-		this.id = session.getId();
-		this.sessionUrl = session.getSessionUrl();
-		this.host = session.getHost();
-		this.port = session.getPort();
 	}
 }

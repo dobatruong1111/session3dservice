@@ -23,4 +23,8 @@ public class Session3dRepository {
     public void deleteById(String id) {
         sessions.remove(id);
     }
+
+    public Map<String, Session3d> getAll() {
+        return this.sessions;
+    }
 }

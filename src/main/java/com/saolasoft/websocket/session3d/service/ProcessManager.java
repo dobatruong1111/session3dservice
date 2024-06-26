@@ -39,13 +39,13 @@ public class ProcessManager {
         return String.format("%s%s%s.txt", this.configProperties.getLogPath(), "/", id);
     }
 
-    public boolean startProcess(Session3d session) {
-        // Create output log file
-        String logFilePath = this.getLogFilePath(session.getId());
+    public boolean startProcess(Session3d session3d) {
+        // Create log file
+        String logFilePath = this.getLogFilePath(session3d.getId());
 
         try {
-            // Set the command to run
-            ProcessBuilder builder = new ProcessBuilder(session.getCmd().split(" "));
+            // Set command to run
+            ProcessBuilder builder = new ProcessBuilder(session3d.getCmd().split(" "));
 
             // Write to log file
             File logFile = new File(logFilePath);
@@ -55,25 +55,23 @@ public class ProcessManager {
             builder.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
             builder.redirectError(ProcessBuilder.Redirect.appendTo(logFile));
 
-            // Start the process
+            // Start process
             Process process = builder.start();
 
-            // Wait for the process to complete
-            //int exitCode = process.waitFor();
-
             // Save process
-            processes.put(session.getId(), process);
+            processes.put(session3d.getId(), process);
 
+            // Check process is ready
             LocalTime startTime = LocalTime.now();
             int count = 0;
             while (true) {
-                if (isReady(session, count)) {
+                if (isReady(session3d, count)) {
                     return true;
                 }
 
                 Duration elapsedTime = Duration.between(startTime, LocalTime.now());
                 if (elapsedTime.getSeconds() > this.configProperties.getTimeout()) {
-                    stopProcess(session.getId());
+                    stopProcess(session3d.getId());
                     return false;
                 }
 
@@ -85,7 +83,6 @@ public class ProcessManager {
                 }
                 count += 1;
             }
-
         } catch (Exception e) {
             logger.error(e.getMessage());
             return false;
@@ -115,14 +112,14 @@ public class ProcessManager {
         return sessionToRelease;
     }
 
-    public boolean isReady(Session3d session, int count) {
+    public boolean isReady(Session3d session3d, int count) {
         // The process has to be running to be ready
-        if (!this.isRunning(session.getId()) && count < 60) {
+        if (!this.isRunning(session3d.getId()) && count < 60) {
             return false;
         }
 
         // Give up after 60 seconds if still not running
-        if (!this.isRunning(session.getId())) {
+        if (!this.isRunning(session3d.getId())) {
             return true;
         }
 
@@ -130,7 +127,7 @@ public class ProcessManager {
         String readyLine = this.appConfigProperties.getViewer().getReadyLine();
         boolean ready = false;
         try {
-            String logFilePath = this.getLogFilePath(session.getId());
+            String logFilePath = this.getLogFilePath(session3d.getId());
             String content = Files.readString(Paths.get(logFilePath));
             if (content.contains(readyLine)) {
                 ready = true;
