@@ -13,5 +13,7 @@ public class Session3dDtoCreate {
 
 	private String seriesUID;
 
-	private String session2D;
+	private String storeUrl;
+
+	private String storeAuth;
 }

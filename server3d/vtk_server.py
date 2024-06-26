@@ -34,10 +34,16 @@ def add_arguments(parser: ArgumentParser) -> None:
         help="seriesUID"
     )
     parser.add_argument(
-        "--session2D",
+        "--storeUrl",
         type=str,
         default=None,
-        help="session2D"
+        help="storeUrl"
+    )
+    parser.add_argument(
+        "--storeAuth",
+        type=str,
+        default=None,
+        help="storeAuth"
     )
 
 def base64_encode(data: str) -> str:
@@ -52,15 +58,6 @@ def get_size_of_dir(path: str) -> int:
     size_kb = size / 1024
     size_mb = size_kb / 1024
     return round(size_mb)
-
-def get_store_url(session2D: str) -> dict:
-    store_url = os.getenv("STORE_URL")
-    store_auth = base64_encode(f"{os.getenv('STORE_AUTH_USERNAME')}:{os.getenv('STORE_AUTH_PASSWORD')}")
-    store = {
-        "store_url": store_url,
-        "store_auth": f"Basic {store_auth}"
-    }
-    return store
     
 def update_info_dicom_dir(
     studyUID: str,
@@ -274,7 +271,10 @@ if __name__ == "__main__":
             json.dump({"status": Status.NONE.value}, file, indent=4)
 
     # Get store url by session2D
-    store = get_store_url(args.session2D)
+    store = {
+        "store_url": args.storeUrl,
+        "store_auth": f"Basic {base64_encode(args.storeAuth)}"
+    }
 
     # Start dicom download process
     thread_download_data = threading.Thread(

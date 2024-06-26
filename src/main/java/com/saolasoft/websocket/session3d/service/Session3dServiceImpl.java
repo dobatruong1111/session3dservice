@@ -52,7 +52,7 @@ public class Session3dServiceImpl implements Session3dService {
 
         String sessionUrl = String.format(configProperties.getSessionUrl(), id);
 
-        String cmd = String.format(String.join(" ", appConfigProperties.getViewer().getCmd()), host, port, object.getStudyUID(), object.getSeriesUID(), object.getSession2D());
+        String cmd = String.format(String.join(" ", appConfigProperties.getViewer().getCmd()), host, port, object.getStudyUID(), object.getSeriesUID(), object.getStoreUrl(), object.getStoreAuth());
 
         Session3d session3d = new Session3d(id, host, port, sessionUrl, cmd);
         // logger.info(String.format("Session3d: id=%s, host=%s, port=%d", session3d.getId(), session3d.getHost(), session3d.getPort()));
