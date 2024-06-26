@@ -23,9 +23,9 @@ public class Session3dAPI {
 	@Autowired
 	private Session3dService session3DService;
 
-	@PostMapping("/3dlink")
-    public APIResponse<Session3dDtoGet> getWebSocketUrl(@RequestBody Session3dDtoCreate object) {
-		Session3dDtoGet session = session3DService.create(object);
+	@PostMapping("/session/{session2D}/3dlink")
+    public APIResponse<Session3dDtoGet> getWebSocketUrl(@RequestParam String session2D, @RequestBody Session3dDtoCreate object) {
+		Session3dDtoGet session = session3DService.create(session2D, object);
 		return new APIResponse<>(new APIResponseHeader(200, "Created"), session);
     }
 }

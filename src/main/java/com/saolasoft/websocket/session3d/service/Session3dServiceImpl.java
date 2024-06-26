@@ -36,7 +36,7 @@ public class Session3dServiceImpl implements Session3dService {
     private AppConfigProperties appConfigProperties;
 
     @Override
-    public Session3dDtoGet create(Session3dDtoCreate object) {
+    public Session3dDtoGet create(String session2D, Session3dDtoCreate object) {
         // Try to free any available resource
         freeDanglingProcesses();
 
