@@ -27,12 +27,13 @@ from tools.panning.panning import PanningInteractorStyle
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 # -------------------------------------------------------------------------
-# ViewManager
+# View Manager
 # -------------------------------------------------------------------------
 
 class Dicom3D(vtk_protocols.vtkWebProtocol):
     def __init__(self) -> None:
         # Dicom directory path
+        # self.dicomDirPath = "./server3d/data/test"
         self.dicomDirPath = None
     
         # Pipeline

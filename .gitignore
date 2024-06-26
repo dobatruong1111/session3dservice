@@ -5,8 +5,15 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .idea/
-server3d/vtkpython/__pycache__/
+server3d/cone/__pycache__/
 server3d/logs/*.txt
+server3d/data/*/
+server3d/model/__pycache__/
+server3d/model/protocol/__pycache__/
+server3d/tools/cropping/__pycache__/
+server3d/tools/measurement/__pycache__/
+server3d/tools/panning/__pycache__/
+server3d/utils/__pycache__/
 
 ### STS ###
 .apt_generated

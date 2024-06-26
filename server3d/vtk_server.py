@@ -17,9 +17,7 @@ from utils.utils import MyAuth
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True)
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-
 logging.basicConfig(level=logging.ERROR, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 def add_arguments(parser: ArgumentParser) -> None:
@@ -36,10 +34,10 @@ def add_arguments(parser: ArgumentParser) -> None:
         help="seriesUID"
     )
     parser.add_argument(
-        "--sessionID",
+        "--session2D",
         type=str,
         default=None,
-        help="sessionID"
+        help="session2D"
     )
 
 def base64_encode(data: str) -> str:
@@ -55,29 +53,14 @@ def get_size_of_dir(path: str) -> int:
     size_mb = size_kb / 1024
     return round(size_mb)
 
-def get_store_url(sessionID: str, studyUID: str) -> dict:
-    default_store_url = os.getenv("DEFAULT_STORE_URL") if os.getenv("DEFAULT_STORE_URL")[-1] != '\r' else os.getenv("DEFAULT_STORE_URL")[:-1]
-    default_store_auth_username = os.getenv("DEFAULT_STORE_AUTH_USERNAME") if os.getenv("DEFAULT_STORE_AUTH_USERNAME")[-1] != '\r' else os.getenv("DEFAULT_STORE_AUTH_USERNAME")[:-1]
-    default_store_auth_password = os.getenv("DEFAULT_STORE_AUTH_PASSWORD") if os.getenv("DEFAULT_STORE_AUTH_PASSWORD")[-1] != '\r' else os.getenv("DEFAULT_STORE_AUTH_PASSWORD")[:-1]
-    default_store_auth = base64_encode(f"{default_store_auth_username}:{default_store_auth_password}")
+def get_store_url(session2D: str) -> dict:
+    store_url = os.getenv("STORE_URL")
+    store_auth = base64_encode(f"{os.getenv('STORE_AUTH_USERNAME')}:{os.getenv('STORE_AUTH_PASSWORD')}")
     store = {
-        "store_url": default_store_url,
-        "store_authentication": f"Basic {default_store_auth}"
+        "store_url": store_url,
+        "store_auth": f"Basic {store_auth}"
     }
-    try:
-        host = os.getenv("HOST") if os.getenv("HOST")[-1] != '\r' else os.getenv("HOST")[:-1]
-        port = os.getenv("PORT_2DSERVER") if os.getenv("PORT_2DSERVER")[-1] != '\r' else os.getenv("PORT_2DSERVER")[:-1]
-        url = f"http://{host}:{port}/v1/ws/rest/session/{sessionID}-{studyUID}"
-        response = requests.get(
-            url
-        )
-        res = response.json()
-        store["store_url"] = res["store_url"]
-        store["store_authentication"] = res["store_authentication"]
-    except Exception as e:
-        logging.error(f"Get store url - exception: {e}")
-    finally:
-        return store
+    return store
     
 def update_info_dicom_dir(
     studyUID: str,
@@ -86,8 +69,8 @@ def update_info_dicom_dir(
     dicomDirPath: str
 ) -> None:
     try:
-        host = os.getenv('HOST') if os.getenv('HOST')[-1] != '\r' else os.getenv('HOST')[:-1]
-        port = os.getenv('PORT_2DSERVER') if os.getenv('PORT_2DSERVER')[-1] != '\r' else os.getenv('PORT_2DSERVER')[:-1]
+        host = os.getenv('HOST')
+        port = os.getenv('PORT')
         url = f"http://{host}:{port}/v1/ws/rest/client/session3d/dicomdir"
         response = requests.post(
             url,
@@ -141,7 +124,7 @@ class Server(vtk_wslink.ServerProtocol):
         threadCount: int = 4
     ) -> None:
         store_url = store["store_url"]
-        store_auth = store["store_authentication"]
+        store_auth = store["store_auth"]
         url = f"{store_url}/studies/{studyUID}/series/{seriesUID}/metadata"
         try:
             response = requests.get(
@@ -178,17 +161,17 @@ class Server(vtk_wslink.ServerProtocol):
                     while get_dicom_dir_status(statusFilePath) == Status.DOWNLOADING.value:
                         logging.info("Waiting 5 seconds...")
                         time.sleep(5)
-                update_info_dicom_dir(
-                    studyUID,
-                    seriesUID,
-                    numberOfImages=len(response.json()),
-                    dicomDirPath=dicomDirPath
-                )
+#                 update_info_dicom_dir(
+#                     studyUID,
+#                     seriesUID,
+#                     numberOfImages=len(response.json()),
+#                     dicomDirPath=dicomDirPath
+#                 )
                 Server.dicomDirPath = dicomDirPath
             else:
-                logging.error(f"Dicom downloaded threading - get metadata - status code: {response.status_code}")
+                logging.error(f"Get metadata: status code = {response.status_code}")
         except Exception as e:
-            logging.error(f"Dicom downloaded threading - exception: {e}")
+            logging.error(f"Get metadata: exception = {e}")
     
     @staticmethod
     def save_instances(
@@ -213,17 +196,17 @@ class Server(vtk_wslink.ServerProtocol):
                         "requestType": "WADO",
                         "contentType": "application/dicom"
                     },
-                    auth = MyAuth(store["store_authentication"])
+                    auth = MyAuth(store["store_auth"])
                 )
                 if response.status_code == 200:
                     bytes = response.content
                     with open(f"{dicomDirPath}/{object_uid}.dcm", "wb") as file:
                         file.write(bytes)
                 else:
-                    logging.info(f"{response.url} - {response.status_code}")
+                    logging.info(f"{name}: {response.url}, status code = {response.status_code}")
             logging.info(f"{name}: done")
         except Exception as e:
-            logging.error(e)
+            logging.error(f"{name}: exception = {e}")
 
     @staticmethod
     def configure(authKey: str) -> None:
@@ -264,41 +247,43 @@ class Server(vtk_wslink.ServerProtocol):
 
             renderWindow.SetInteractor(renderWindowInteractor)
 
-            # self.getApplication() -> vtkWebApplication()
             self.getApplication().GetObjectIdMap().SetActiveObject("VIEW", renderWindow)
 
 # =============================================================================
-# Main: Parse args and start serverviewId
+# Main: Parse args and start server3d
 # =============================================================================
 
 if __name__ == "__main__":
     # Create argument parser
-    parser = ArgumentParser(description="3D Viewer")
+    parser = ArgumentParser(description="Server3D")
 
     # Add arguments
     server.add_arguments(parser)
     add_arguments(parser)
 
+    # Get arguments
     args = parser.parse_args()
-    Server.configure(args.authKey)
+    # Server.configure(args.authKey)
 
-    store = get_store_url(sessionID=args.sessionID, studyUID=args.studyUID)
-
-    dir_path = f"./viewerserver/module/server_3dviewer/data/{args.studyUID}/{args.seriesUID}"
+    dir_path = f"./server3d/data/{args.studyUID}/{args.seriesUID}"
     dicom_dir_path = f"{dir_path}/data"
     status_file_path = f"{dir_path}/status.json"
-
     if not os.path.exists(dir_path):
         os.makedirs(dicom_dir_path)
         with open(status_file_path, mode='w') as file:
             json.dump({"status": Status.NONE.value}, file, indent=4)
 
+    # Get store url by session2D
+    store = get_store_url(args.session2D)
+
+    # Start dicom download process
     thread_download_data = threading.Thread(
         target=Server.save_all_instances,
         args=(store, args.studyUID, args.seriesUID, dicom_dir_path, status_file_path, 8,)
     )
     thread_download_data.start()
 
+    # Start server3d
     server.start_webserver(
         options=args,
         protocol=Server,

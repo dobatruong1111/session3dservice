@@ -12,4 +12,6 @@ public class Session3dDtoCreate {
 	private String studyUID;
 
 	private String seriesUID;
+
+	private String session2D;
 }
