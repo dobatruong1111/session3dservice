@@ -10,7 +10,7 @@ import com.saolasoft.websocket.base.response.APIResponse;
 
 @CrossOrigin(
 		origins = {
-				"http://192.168.1.141:3000"
+				"http://192.168.1.172:3000"
 		},
 		methods = {
 				RequestMethod.POST

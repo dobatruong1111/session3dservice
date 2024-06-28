@@ -114,7 +114,7 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
             self.widget.Off()
             self.checkBox = False
 
-    @exportRpc("vtk.initialize")
+    @exportRpc("volume.initialize")
     def createVisualization(self) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         renderer = renderWindow.GetRenderers().GetFirstRenderer()
@@ -161,9 +161,8 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
         # Render window
         renderWindow.Render()
         
-    @exportRpc("vtk.dicom3d.presets.bone.ct")
-    def showBoneCT(self) -> None:
-        # renderWindow = self.getView('-1')
+    @exportRpc("volume.bone.preset.ct")
+    def applyBonePresetCT(self) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         self.colorMappingWithStandardCT()
 
@@ -175,9 +174,8 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
         renderWindow.Render()
         self.getApplication().InvokeEvent(vtkCommand.UpdateEvent)
       
-    @exportRpc("vtk.dicom3d.presets.angio.ct")
-    def showAngioCT(self) -> None:
-        # renderWindow = self.getView('-1')
+    @exportRpc("volume.angio.preset.ct")
+    def applyAngioPresetCT(self) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         self.colorMappingWithStandardCT()
 
@@ -189,9 +187,8 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
         renderWindow.Render()
         self.getApplication().InvokeEvent(vtkCommand.UpdateEvent)
 
-    @exportRpc("vtk.dicom3d.presets.muscle.ct")
-    def showMuscleCT(self) -> None:
-        # renderWindow = self.getView('-1')
+    @exportRpc("volume.muscle.preset.ct")
+    def applyMusclePresetCT(self) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         self.colorMappingWithStandardCT()
 
@@ -203,9 +200,8 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
         renderWindow.Render()
         self.getApplication().InvokeEvent(vtkCommand.UpdateEvent)
 
-    @exportRpc("vtk.dicom3d.presets.mip")
-    def showMip(self) -> None:
-        # renderWindow = self.getView('-1')
+    @exportRpc("volume.mip.preset.ct")
+    def applyMipPresetCT(self) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
 
         self.color.RemoveAllPoints()
@@ -232,8 +228,8 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
             self.cellPicker.PickFromListOn()
             renderWindowInteractor.SetPicker(self.cellPicker)
 
-    @exportRpc("vtk.dicom3d.length.measurement")
-    def lengthMeasurement(self) -> None:
+    @exportRpc("volume.length")
+    def activeLengthMeasurement(self) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         renderWindowInteractor = renderWindow.GetInteractor()
         renderer = renderWindow.GetRenderers().GetFirstRenderer()

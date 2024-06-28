@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "server3d"
+version = "0.1.0"
+description = "3d viewer server"
+authors = ["dobatruong", "batruongdo3@gmail.com"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+wslink = "1.11.0"
+vtk = "9.2.6"
+psutil = "^6.0.0"
+requests = "^2.32.3"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

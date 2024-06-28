@@ -14,9 +14,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 from utils.utils import MyAuth
 
-from dotenv import load_dotenv
-
-load_dotenv(verbose=True)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logging.basicConfig(level=logging.ERROR, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
@@ -58,29 +55,6 @@ def get_size_of_dir(path: str) -> int:
     size_kb = size / 1024
     size_mb = size_kb / 1024
     return round(size_mb)
-    
-def update_info_dicom_dir(
-    studyUID: str,
-    seriesUID: str,
-    numberOfImages: int,
-    dicomDirPath: str
-) -> None:
-    try:
-        host = os.getenv('HOST')
-        port = os.getenv('PORT')
-        url = f"http://{host}:{port}/v1/ws/rest/client/session3d/dicomdir"
-        response = requests.post(
-            url,
-            json={
-                "studyUID": studyUID,
-                "seriesUID": seriesUID,
-                "numberOfImages": numberOfImages,
-                "sizeOnDisk": f"{get_size_of_dir(dicomDirPath)}MB"
-            }
-        )
-        logging.info(f"Update used time of dicom directory - status code: {response.status_code}")
-    except Exception as e:
-        logging.error(f"Update used time of dicom directory - exception: {e}")
 
 def add_dicom_dir_path_and_dicom_dir_status(statusFilePath: str, dicomDirStatus: str) -> None:
     with open(statusFilePath, mode='r+') as file:
@@ -158,12 +132,6 @@ class Server(vtk_wslink.ServerProtocol):
                     while get_dicom_dir_status(statusFilePath) == Status.DOWNLOADING.value:
                         logging.info("Waiting 5 seconds...")
                         time.sleep(5)
-#                 update_info_dicom_dir(
-#                     studyUID,
-#                     seriesUID,
-#                     numberOfImages=len(response.json()),
-#                     dicomDirPath=dicomDirPath
-#                 )
                 Server.dicomDirPath = dicomDirPath
             else:
                 logging.error(f"Get metadata: status code = {response.status_code}")
@@ -270,10 +238,10 @@ if __name__ == "__main__":
         with open(status_file_path, mode='w') as file:
             json.dump({"status": Status.NONE.value}, file, indent=4)
 
-    # Get store url by session2D
+    # Get store url
     store = {
         "store_url": args.storeUrl,
-        "store_auth": f"Basic {base64_encode(args.storeAuth)}"
+        "store_auth": args.storeAuth.replace(":", " ")
     }
 
     # Start dicom download process

@@ -12,5 +12,5 @@ public class Session3dDtoGet {
 	
 	private String id;
 
-	private String sessionUrl;
+	private String websocketUrl;
 }

@@ -29,7 +29,7 @@ public class ResourceManager {
 			if (!resources.containsKey(host)) {
 				resources.put(host, new Resource3d(portList, new ArrayList<>()));
 			} else {
-				resources.get(host).getAvailableResource().addAll(portList);
+				resources.get(host).getAvailable().addAll(portList);
 			}
 		}
 	}
@@ -39,17 +39,17 @@ public class ResourceManager {
 		int availibilityCount = 0;
 		
 		for (String host: this.resources.keySet()) {
-			if (availibilityCount < this.resources.get(host).getAvailableResource().size()) {
-				availibilityCount = this.resources.get(host).getAvailableResource().size();
+			if (availibilityCount < this.resources.get(host).getAvailable().size()) {
+				availibilityCount = this.resources.get(host).getAvailable().size();
 				winner = host;
 			}
 		}
 		
 		if (winner != null) {
-			int size = this.resources.get(winner).getAvailableResource().size();
-			int port = this.resources.get(winner).getAvailableResource().get(size - 1);
-			this.resources.get(winner).getAvailableResource().remove(size - 1);
-			this.resources.get(winner).getUsedAvailable().add(port);
+			int size = this.resources.get(winner).getAvailable().size();
+			int port = this.resources.get(winner).getAvailable().get(size - 1);
+			this.resources.get(winner).getAvailable().remove(size - 1);
+			this.resources.get(winner).getUsed().add(port);
 			return String.format("%s:%d", winner, port);
 		}
 		return "";
@@ -57,12 +57,12 @@ public class ResourceManager {
 	
 	public void freeResource(String host, int port) {
 		if (this.resources.containsKey(host)) {
-			if (this.resources.get(host).getUsedAvailable().contains(port)) {
-				int index = this.resources.get(host).getUsedAvailable().indexOf(port);
-				this.resources.get(host).getUsedAvailable().remove(index);
+			if (this.resources.get(host).getUsed().contains(port)) {
+				int index = this.resources.get(host).getUsed().indexOf(port);
+				this.resources.get(host).getUsed().remove(index);
 			}
-			if (!this.resources.get(host).getAvailableResource().contains(port)) {
-				this.resources.get(host).getAvailableResource().add(port);
+			if (!this.resources.get(host).getAvailable().contains(port)) {
+				this.resources.get(host).getAvailable().add(port);
 			}
 		}
 	}

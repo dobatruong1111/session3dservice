@@ -50,11 +50,11 @@ public class Session3dServiceImpl implements Session3dService {
 
         int port = Integer.parseInt(resource.split(":")[1]);
 
-        String sessionUrl = String.format(configProperties.getSessionUrl(), id);
+        String websocketUrl = String.format(configProperties.getWebsocketUrl(), id);
 
-        String cmd = String.format(String.join(" ", appConfigProperties.getViewer().getCmd()), host, port, object.getStudyUID(), object.getSeriesUID(), object.getStoreUrl(), object.getStoreAuth());
+        String cmd = String.format(String.join(" ", appConfigProperties.getViewer().getCmd()), host, port, object.getStudyUID(), object.getSeriesUID(), object.getStoreUrl(), object.getStoreAuth().replace(" ", ":"));
 
-        Session3d session3d = new Session3d(id, host, port, sessionUrl, cmd);
+        Session3d session3d = new Session3d(id, host, port, websocketUrl, cmd);
         // logger.info(String.format("Session3d: id=%s, host=%s, port=%d", session3d.getId(), session3d.getHost(), session3d.getPort()));
 
         // Wait until process to be ready
@@ -66,7 +66,7 @@ public class Session3dServiceImpl implements Session3dService {
         // Save session into DB
         session3DRepository.save(session3d);
 
-        return new Session3dDtoGet(id, sessionUrl);
+        return new Session3dDtoGet(id, websocketUrl);
     }
 
     // Kill unused/dangling/obsolete process
