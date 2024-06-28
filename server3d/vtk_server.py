@@ -8,7 +8,7 @@ from vtk.web import wslink as vtk_wslink
 
 from vtk.web import protocols as vtk_protocols
 
-from protocol.vtk_protocol import Dicom3D
+from protocol.vtk_protocol import Volume
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -81,7 +81,7 @@ class Status(enum.Enum):
 class Server(vtk_wslink.ServerProtocol):
     # Defaults
     authKey = "wslink-secret"
-    dicom3d = Dicom3D()
+    volume = Volume()
     view = None
     dicomDirPath = None
 
@@ -179,7 +179,7 @@ class Server(vtk_wslink.ServerProtocol):
 
     def onConnect(self, request, client_id) -> None:
         while self.dicomDirPath is None: time.sleep(5)
-        else: self.dicom3d.dicomDirPath = self.dicomDirPath
+        else: self.volume.dicomDirPath = self.dicomDirPath
 
     def initialize(self) -> None:
         # Bring Used Components
@@ -189,7 +189,7 @@ class Server(vtk_wslink.ServerProtocol):
         self.registerVtkWebProtocol(vtk_protocols.vtkWebPublishImageDelivery(decode=False))
         
         # Custom API
-        self.registerVtkWebProtocol(self.dicom3d)
+        self.registerVtkWebProtocol(self.volume)
 
         # tell the C++ web app to use no encoding.
         # ParaViewWebPublishImageDelivery must be set to decode=False to match.
@@ -211,7 +211,6 @@ class Server(vtk_wslink.ServerProtocol):
             renderWindowInteractor.EnableRenderOff()
 
             renderWindow.SetInteractor(renderWindowInteractor)
-
             self.getApplication().GetObjectIdMap().SetActiveObject("VIEW", renderWindow)
 
 # =============================================================================

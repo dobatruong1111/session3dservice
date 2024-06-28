@@ -30,7 +30,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(level
 # View Manager
 # -------------------------------------------------------------------------
 
-class Dicom3D(vtk_protocols.vtkWebProtocol):
+class Volume(vtk_protocols.vtkWebProtocol):
     def __init__(self) -> None:
         # Dicom directory path
         # self.dicomDirPath = "./server3d/data/test"
@@ -229,7 +229,7 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
             renderWindowInteractor.SetPicker(self.cellPicker)
 
     @exportRpc("volume.length")
-    def activeLengthMeasurement(self) -> None:
+    def activeLength(self) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         renderWindowInteractor = renderWindow.GetInteractor()
         renderer = renderWindow.GetRenderers().GetFirstRenderer()
@@ -245,8 +245,8 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
 
         self.getApplication().InvokeEvent(vtkCommand.UpdateEvent)
 
-    @exportRpc("vtk.dicom3d.angle.measurement")
-    def angleMeasurement(self) -> None:
+    @exportRpc("volume.angle")
+    def activeAngle(self) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         renderWindowInteractor = renderWindow.GetInteractor()
         renderer = renderWindow.GetRenderers().GetFirstRenderer()
@@ -265,8 +265,8 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
 
         self.getApplication().InvokeEvent(vtkCommand.UpdateEvent)
 
-    @exportRpc("vtk.dicom3d.crop")
-    def crop(self) -> None:
+    @exportRpc("volume.cut")
+    def activeCut(self) -> None:
         # self.getApplication() -> vtkWebApplication()
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         renderWindowInteractor = renderWindow.GetInteractor()
@@ -300,8 +300,8 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
         renderWindow.Render()
         self.getApplication().InvokeEvent(vtkCommand.UpdateEvent)
 
-    @exportRpc("vtk.dicom3d.crop.freehand")
-    def cropFreehand(self, operation: Operation = Operation.INSIDE, fillValue: int = -1000) -> None:
+    @exportRpc("volume.cut.freehand")
+    def activeCutFreehand(self, operation: Operation = Operation.INSIDE, fillValue: int = -1000) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         renderWindowInteractor = renderWindow.GetInteractor()
         renderer = renderWindow.GetRenderers().GetFirstRenderer()
@@ -340,8 +340,8 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
         renderWindowInteractor.SetInteractorStyle(self.cropFreehandInteractorStyle)
         self.getApplication().InvokeEvent(vtkCommand.UpdateEvent)
 
-    @exportRpc("vtk.camera.reset")
-    def resetCamera(self) -> None:
+    @exportRpc("volume.reset")
+    def activeReset(self) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         renderWindowInteractor = renderWindow.GetInteractor()
         renderer = renderWindow.GetRenderers().GetFirstRenderer()
@@ -382,8 +382,8 @@ class Dicom3D(vtk_protocols.vtkWebProtocol):
         self.getApplication().InvalidateCache(renderWindow)
         self.getApplication().InvokeEvent(vtkCommand.UpdateEvent)
     
-    @exportRpc("vtk.dicom3d.panning")
-    def panning(self) -> None:
+    @exportRpc("volume.pan")
+    def activePan(self) -> None:
         renderWindow = self.getApplication().GetObjectIdMap().GetActiveObject("VIEW")
         renderWindowInteractor = renderWindow.GetInteractor()
 
